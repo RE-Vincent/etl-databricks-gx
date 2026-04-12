@@ -205,3 +205,7 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Sintetic Data Generator
+#  Sintetic is an AI-powered synthetic data generator. `.sinteticignore` specifies
+*.csv

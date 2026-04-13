@@ -1,0 +1,21 @@
+name: bronze_to_silver_check
+config_version: 1.0
+class_name: Checkpoint
+validations:
+  - batch_request:
+      datasource_name: my_spark_datasource
+      data_asset_name: customers_asset # Nombre lógico
+    expectation_suite_name: customer_suite
+  - batch_request:
+      datasource_name: my_spark_datasource
+      data_asset_name: products_asset
+    expectation_suite_name: product_suite
+  - batch_request:
+      datasource_name: my_spark_datasource
+      data_asset_name: orders_asset
+    expectation_suite_name: order_suite
+action_list:
+  - name: store_validation_result
+    action: {class_name: StoreValidationResultAction}
+  - name: update_data_docs
+    action: {class_name: UpdateDataDocsAction}

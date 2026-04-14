@@ -53,8 +53,11 @@ orders.loc[3, "quantity"] = -1
 orders.loc[3, "product_id"] = None
 
 # guardar CSV
-customers.to_csv("customers.csv", index=False)
-products.to_csv("products.csv", index=False)
-orders.to_csv("orders.csv", index=False)
+landing_path = "/dbfs/FileStore/landing_zone/"
+
+
+customers.to_csv(f"{landing_path}customers.csv", index=False)
+products.to_csv(f"{landing_path}products.csv", index=False)
+orders.to_csv(f"{landing_path}orders.csv", index=False)
 
 print("Datos generados!")

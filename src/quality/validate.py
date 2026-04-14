@@ -1,24 +1,35 @@
 import great_expectations as gx
-from great_expectations.dataset import SparkDFDataset
+import pandas as pd
 
-def validate_dataframe(df, suite_path):
-    import json
+def validate_all_layer(context: gx.DataContext, customers_df: pd.DataFrame, products_df: pd.DataFrame, orders_df: pd.DataFrame) -> bool:
+    # Definimos qué DataFrame va con qué validación del Checkpoint
+    batch_requests = [
+        {
+            "datasource_name": "my_spark_datasource",
+            "data_asset_name": "customers_asset",
+            "batch_data": customers_df,
+        },
+        {
+            "datasource_name": "my_spark_datasource",
+            "data_asset_name": "products_asset",
+            "batch_data": products_df,
+        },
+        {
+            "datasource_name": "my_spark_datasource",
+            "data_asset_name": "orders_asset",
+            "batch_data": orders_df,
+        }
+    ]
 
-    with open(suite_path) as f:
-        suite = json.load(f)
+    # Ejecutamos el checkpoint pasando los datos "vivos"
+    # Esto sobreescribe los assets del YAML con tus variables de Spark
+    result = context.run_checkpoint(
+        checkpoint_name="bronze_to_silver_check",
+        validations=batch_requests
+    )
 
-    gx_df = SparkDFDataset(df)
-
-    results = []
-
-    for exp in suite["expectations"]:
-        func = getattr(gx_df, exp["expectation_type"])
-        result = func(**exp["kwargs"])
-        results.append(result["success"])
-
-    success = all(results)
-
-    if not success:
-        raise Exception(f"Data quality failed: {suite_path}")
-
+    if not result.success:
+        # GX ya generó los JSON y el HTML automáticamente por las "Actions"
+        raise Exception("Data quality failed. Check Data Docs for details.")
+    
     return True

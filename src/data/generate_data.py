@@ -1,5 +1,10 @@
+from src.utils.spark import get_spark
 import pandas as pd
 import numpy as np
+from pyspark.dbutils import DBUtils
+
+spark = get_spark("generate-data")
+dbutils = DBUtils(spark)
 
 np.random.seed(42)
 
@@ -54,8 +59,7 @@ orders.loc[3, "product_id"] = None
 
 # guardar CSV
 landing_path = "/dbfs/FileStore/landing_zone/"
-
-
+dbutils.fs.mkdirs(landing_path)
 customers.to_csv(f"{landing_path}customers.csv", index=False)
 products.to_csv(f"{landing_path}products.csv", index=False)
 orders.to_csv(f"{landing_path}orders.csv", index=False)

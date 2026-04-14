@@ -2,12 +2,32 @@ from src.utils.spark import get_spark
 
 spark = get_spark("bronze-ingest")
 
+landing_path = "/dbfs/FileStore/landing_zone/"
+
 # cargar CSV
-customers = spark.read.csv("customers.csv", header=True, inferSchema=True)
-products = spark.read.csv("products.csv", header=True, inferSchema=True)
-orders = spark.read.csv("orders.csv", header=True, inferSchema=True)
+customers = spark.read.format("csv") \
+    .option("header", "true") \
+    .option("inferSchema", "true") \
+    .load(f"{landing_path}customers.csv")
+products = spark.read.format("csv") \
+    .option("header", "true") \
+    .option("inferSchema", "true") \
+    .load(f"{landing_path}products.csv")
+orders = spark.read.format("csv") \
+    .option("header", "true") \
+    .option("inferSchema", "true") \
+    .load(f"{landing_path}orders.csv")
 
 # guardar en bronze
-customers.write.format("delta").mode("overwrite").saveAsTable("bronze.customers")
-products.write.format("delta").mode("overwrite").saveAsTable("bronze.products")
-orders.write.format("delta").mode("overwrite").saveAsTable("bronze.orders")
+# Crear la base de datos si no existe (Para el esquema Bronze)
+spark.sql("CREATE DATABASE IF NOT EXISTS bronze")
+
+customers.write.format("delta") \
+    .mode("overwrite") \
+    .saveAsTable("bronze.customers")
+products.write.format("delta") \
+    .mode("overwrite") \
+    .saveAsTable("bronze.products")
+orders.write.format("delta") \
+    .mode("overwrite") \
+    .saveAsTable("bronze.orders")

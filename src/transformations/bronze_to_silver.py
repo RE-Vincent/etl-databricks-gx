@@ -24,6 +24,8 @@ products_clean = products.filter("price > 0")
 orders_clean = orders.filter("quantity > 0")
 
 # 5. Guardar silver
+# Crear la base de datos si no existe (Para el esquema Silver)
+spark.sql("CREATE DATABASE IF NOT EXISTS silver")
 customers_clean.write.format("delta").mode("overwrite").saveAsTable("silver.customers")
 products_clean.write.format("delta").mode("overwrite").saveAsTable("silver.products")
 orders_clean.write.format("delta").mode("overwrite").saveAsTable("silver.orders")

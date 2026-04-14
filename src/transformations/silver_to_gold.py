@@ -12,5 +12,6 @@ df = orders.join(products, "product_id")
 gold = df.groupBy("product_name").agg(
     sum("quantity").alias("total_quantity")
 )
-
+# Crear la base de datos si no existe (Para el esquema Gold)
+spark.sql("CREATE DATABASE IF NOT EXISTS gold")
 gold.write.format("delta").mode("overwrite").saveAsTable("gold.sales")

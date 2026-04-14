@@ -1,7 +1,7 @@
-from pyspark.sql import SparkSession
+from src.utils.spark import get_spark
 from pyspark.sql.functions import sum
 
-spark = SparkSession.builder.getOrCreate()
+spark = get_spark("gold-ingest")
 
 orders = spark.table("silver.orders")
 products = spark.table("silver.products")

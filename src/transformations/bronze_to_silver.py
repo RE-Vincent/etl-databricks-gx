@@ -1,24 +1,29 @@
-from pyspark.sql import SparkSession
-from src.quality.validate import validate_dataframe
+from src.utils.spark import get_spark
+import great_expectations as gx
+from src.quality.validate import validate_all_layers
+import os
 
-spark = SparkSession.builder.getOrCreate()
+spark = get_spark("silver-ingest")
 
-# leer bronze
+# 1. Configurar GX (Apunta a la carpeta de tu repo)
+repo_root = os.path.abspath(os.path.join(os.getcwd()))
+context = gx.get_context(project_root_dir=f"{repo_root}/gx")
+
+# 2. Leer bronze
 customers = spark.table("bronze.customers")
 products = spark.table("bronze.products")
 orders = spark.table("bronze.orders")
 
-# validar
-validate_dataframe(customers, "customers_suite.json")
-validate_dataframe(products, "products_suite.json")
-validate_dataframe(orders, "orders_suite.json")
+# 3. VALIDAR (In-memory, antes de limpiar)
+# Pasamos el contexto y los 3 dataframes
+validate_all_layers(context, customers, products, orders)
 
-# limpieza simple
+# 4. Limpieza (Solo llegamos aquí si la validación pasó)
 customers_clean = customers.dropna()
 products_clean = products.filter("price > 0")
 orders_clean = orders.filter("quantity > 0")
 
-# guardar silver
+# 5. Guardar silver
 customers_clean.write.format("delta").mode("overwrite").saveAsTable("silver.customers")
 products_clean.write.format("delta").mode("overwrite").saveAsTable("silver.products")
 orders_clean.write.format("delta").mode("overwrite").saveAsTable("silver.orders")

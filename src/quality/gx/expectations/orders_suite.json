@@ -1,11 +1,97 @@
 {
+  "expectation_suite_name": "order_suite",
+  "ge_cloud_id": null,
   "expectations": [
+    {
+      "expectation_type": "expect_table_columns_to_match_ordered_list",
+      "kwargs": {
+        "column_list": [
+          "order_id",
+          "customer_id",
+          "product_id",
+          "quantity",
+          "order_date"
+        ]
+      },
+      "meta": {
+        "dimension": "schema",
+        "notes": "Valida que la estructura de la orden sea consistente para el proceso de facturación."
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_unique",
+      "kwargs": {
+        "column": "order_id"
+      },
+      "meta": {
+        "dimension": "uniqueness",
+        "severity": "critical",
+        "notes": "Cada orden debe tener un ID único."
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "product_id"
+      },
+      "meta": {
+        "dimension": "integrity",
+        "severity": "critical",
+        "notes": "Captura el error de la fila 3 donde el product_id es None. No puede existir una orden sin producto."
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "customer_id"
+      },
+      "meta": {
+        "dimension": "integrity",
+        "notes": "Toda orden debe estar asociada a un cliente."
+      }
+    },
     {
       "expectation_type": "expect_column_values_to_be_between",
       "kwargs": {
         "column": "quantity",
         "min_value": 1
+      },
+      "meta": {
+        "dimension": "accuracy",
+        "notes": "Captura el error de la fila 3 donde quantity es -1. La cantidad mínima permitida es 1."
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_between",
+      "kwargs": {
+        "column": "order_date",
+        "max_value": "2026-04-14",
+        "min_value": "2024-01-01"
+      },
+      "meta": {
+        "dimension": "consistency",
+        "notes": "Asegura que las órdenes estén dentro del periodo de operación esperado."
+      }
+    },
+    {
+      "expectation_type": "expect_table_row_count_to_be_between",
+      "kwargs": {
+        "max_value": 250,
+        "min_value": 150
+      },
+      "meta": {
+        "dimension": "volume",
+        "notes": "Monitorea que el flujo de órdenes diarias sea normal (alrededor de 200)."
       }
     }
-  ]
+  ],
+  "meta": {
+    "citations": [
+      {
+        "citation_date": "2026-04-14T17:10:00Z",
+        "comment": "Suite de validación para transacciones de ventas (Orders)."
+      }
+    ],
+    "great_expectations_version": "0.18.x"
+  }
 }

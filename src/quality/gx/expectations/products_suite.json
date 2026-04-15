@@ -1,11 +1,100 @@
 {
+  "expectation_suite_name": "product_suite",
+  "ge_cloud_id": null,
   "expectations": [
+    {
+      "expectation_type": "expect_table_columns_to_match_ordered_list",
+      "kwargs": {
+        "column_list": [
+          "product_id",
+          "product_name",
+          "price",
+          "discount",
+          "product_rating"
+        ]
+      },
+      "meta": {
+        "dimension": "schema",
+        "notes": "Valida que el esquema de productos no haya cambiado."
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_unique",
+      "kwargs": {
+        "column": "product_id"
+      },
+      "meta": {
+        "dimension": "uniqueness",
+        "severity": "critical",
+        "notes": "El ID de producto debe ser único para evitar errores en el join de ventas."
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "product_name",
+        "mostly": 0.98
+      },
+      "meta": {
+        "dimension": "missingness",
+        "notes": "No se permiten productos sin nombre en la capa Silver."
+      }
+    },
     {
       "expectation_type": "expect_column_values_to_be_between",
       "kwargs": {
         "column": "price",
-        "min_value": 0
+        "min_value": 0.01
+      },
+      "meta": {
+        "dimension": "accuracy",
+        "severity": "critical",
+        "notes": "Captura el error de precio -100. Los precios deben ser mayores a cero."
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_between",
+      "kwargs": {
+        "column": "discount",
+        "min_value": 0,
+        "max_value": 1.0
+      },
+      "meta": {
+        "dimension": "validity",
+        "notes": "El descuento debe ser un porcentaje entre 0 y 1 (0% a 100%)."
+      }
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_between",
+      "kwargs": {
+        "column": "product_rating",
+        "min_value": 1.0,
+        "max_value": 5.0
+      },
+      "meta": {
+        "dimension": "consistency",
+        "notes": "Valida que el rating esté en la escala estándar de 1 a 5 estrellas."
+      }
+    },
+    {
+      "expectation_type": "expect_table_row_count_to_be_between",
+      "kwargs": {
+        "min_value": 45,
+        "max_value": 55
+      },
+      "meta": {
+        "dimension": "volume",
+        "notes": "Valida que el catálogo tenga el tamaño esperado de ~50 productos."
       }
     }
-  ]
+  ],
+  "meta": {
+    "citations": [
+      {
+        "citation_date": "2026-04-14T13:30:00Z",
+        "comment": "Suite de validación para el catálogo de productos."
+      }
+    ],
+    "great_expectations_version": "0.18.x"
+  }
 }

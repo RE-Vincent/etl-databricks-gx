@@ -1,19 +1,21 @@
 config_version: 3.0
 
 # 1. DÓNDE ESTÁN TUS REGLAS (Expectations)
+# Las mantenemos relativas al repo para que viajen con tu Git
 stores:
   expectations_store:
     class_name: ExpectationsStore
     store_backend:
       class_name: TupleFilesystemStoreBackend
-      base_directory: expectations/  # Relativo a la carpeta /gx del repo
+      base_directory: expectations/
 
-  # 2. DÓNDE SE GUARDAN LOS JSON DE RESULTADOS (Validations) - AQUÍ VA TU HISTÓRICO
+  # 2. DÓNDE SE GUARDAN LOS JSON DE RESULTADOS (Validations)
+  # Apuntamos al Volumen para persistencia fuera del cluster
   validations_store:
     class_name: ValidationsStore
     store_backend:
       class_name: TupleFilesystemStoreBackend
-      base_directory: /dbfs/gx/results/  # Ruta persistente en Databricks
+      base_directory: /Volumes/workspace/default/landing_zone/gx_metadata/validations/
 
   # 3. DÓNDE SE GUARDAN LOS CHECKPOINTS
   checkpoint_store:
@@ -23,12 +25,13 @@ stores:
       base_directory: checkpoints/
 
 # 4. CONFIGURACIÓN DEL REPORTE VISUAL (Data Docs)
+# El HTML se generará en el Volumen, lo que permite verlo incluso si el cluster se apaga
 data_docs_sites:
   local_site:
     class_name: SiteBuilder
     store_backend:
       class_name: TupleFilesystemStoreBackend
-      base_directory: /dbfs/gx/static/data_docs/ # Ruta persistente para ver el HTML
+      base_directory: /Volumes/workspace/default/landing_zone/gx_metadata/data_docs/
     site_index_builder:
       class_name: DefaultSiteIndexBuilder
 
